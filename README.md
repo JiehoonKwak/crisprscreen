@@ -1,0 +1,2 @@
+# CRISPR screen candiates curation
+.
