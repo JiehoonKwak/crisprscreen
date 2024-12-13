@@ -1,0 +1,174 @@
+---
+title: "Power Calculation for CRISPR screen"
+author: "Jiehoon Kwak"
+date: "`r Sys.Date()`"
+format:
+  pdf:
+    documentclass: article
+    classoption: a4paper,9pt
+    geometry: margin=0.75in
+    code-link: true
+    colorlinks: true
+    highlight-style: github
+execute:
+  cache: true
+  message: false
+mainfont: "Noto Serif KR"
+sansfont: "Noto Sans KR"
+monofont: "D2Coding"
+---
+
+```{r}
+#| label: load-packages
+#| message: false
+library(tidyverse)
+library(lme4)
+library(janitor)
+```
+
+
+# 1. Clone simulation
+- assumption : 200 sgRNAs, 10 clones per mouse
+
+```{r}
+num_sgRNAs <- 200
+clones_per_mouse <- 10
+
+# Function to simulate the number of clones per sgRNA
+simulate_clones_per_sgRNA <- function(num_mice) {
+  total_clones <- num_mice * clones_per_mouse
+  sgRNA_assignments <- sample(1:num_sgRNAs, total_clones, replace = TRUE)
+  clones_per_sgRNA <- table(sgRNA_assignments)
+  clones_per_sgRNA_full <- tibble(
+    sgRNA = 1:num_sgRNAs,
+    clones = 0
+  )
+  clones_per_sgRNA_full$clones[as.integer(names(clones_per_sgRNA))] <- as.integer(clones_per_sgRNA)
+  return(clones_per_sgRNA_full)
+}
+```
+
+## Simulation
+```{r}
+num_mice_values <- seq(10, 200, by = 10)
+results <- tibble(
+  num_mice = num_mice_values
+)  %>% 
+  mutate(
+    simulation = map(num_mice, ~ simulate_clones_per_sgRNA(.x)),
+    avg_clones_per_sgRNA = map_dbl(simulation, ~ mean(.x$clones)),
+    sgRNA_coverage = map_dbl(simulation, ~ mean(.x$clones > 0) * 100)
+  )
+```
+
+## Visualization
+```{r}
+# Plotting Average Clones per sgRNA vs Number of Mice
+plot1 <- results %>%
+  ggplot(aes(x = num_mice, y = avg_clones_per_sgRNA)) +
+  geom_line() +
+  geom_point() +
+  geom_hline(yintercept = 5, linetype = "dashed", color = "red") +
+  labs(
+    x = "Number of Mice",
+    y = "Average Clones per sgRNA",
+    title = "Average Clones per sgRNA vs Number of Mice"
+  ) +
+  theme_minimal() + 
+    theme(plot.title = element_text(hjust = 0.5))
+
+# Plotting sgRNA Coverage vs Number of Mice
+plot2 <- results %>%
+  ggplot(aes(x = num_mice, y = sgRNA_coverage)) +
+  geom_line() +
+  geom_point() +
+  geom_hline(yintercept = 95, linetype = "dashed", color = "red") +
+  labs(
+    x = "Number of Mice",
+    y = "Percentage of sgRNAs Represented",
+    title = "sgRNA Coverage vs Number of Mice"
+  ) +
+  theme_minimal() +
+    theme(plot.title = element_text(hjust = 0.5))
+
+# Display plots
+print(plot1)
+print(plot2)
+```
+
+
+# 2. Power Calculation
+
+```{r}
+effect_size <- 0.5
+sigma_within <- 1
+sigma_between <- 0.5
+alpha <- 0.05
+nsim <- 100
+
+simulate_power <- function(num_mice) {
+  total_clones <- num_mice * clones_per_mouse
+  power_results <- numeric(nsim)
+  
+  for (sim in 1:nsim) {
+    # Simulate sgRNA assignments
+    sgRNA_assignments <- sample(1:num_sgRNAs, total_clones, replace = TRUE)
+    # Focus on one sgRNA of interest (e.g., sgRNA 1)
+    sgRNA_interest <- 1
+    clones_with_sgRNA <- which(sgRNA_assignments == sgRNA_interest)
+    n_clones_sgRNA <- length(clones_with_sgRNA)
+    # Skip if insufficient clones
+    if (n_clones_sgRNA < 2) next
+    # Simulate data for clones with sgRNA and controls
+    n_cells_per_clone <- 10 # Number of cells per clone
+    total_cells <- n_clones_sgRNA * n_cells_per_clone * 2
+    data <- tibble(
+      sgRNA = rep(c('sgRNA', 'control'), each = n_clones_sgRNA * n_cells_per_clone),
+      Clone = factor(rep(1:(2 * n_clones_sgRNA), each = n_cells_per_clone))
+    )
+    # Simulate outcomes
+    data <- data %>%
+      mutate(
+        Clone_Effect = rep(rnorm(2 * n_clones_sgRNA, mean = 0, sd = sigma_between), each = n_cells_per_clone),
+        Residual = rnorm(total_cells, mean = 0, sd = sigma_within),
+        Outcome = 10 + if_else(sgRNA == 'sgRNA', effect_size, 0) + Clone_Effect + Residual
+      )
+    # Fit mixed-effects model
+    model <- try(lmer(Outcome ~ sgRNA + (1 | Clone), data = data), silent = TRUE)
+    if (class(model) == "try-error") next
+    p_value <- summary(model)$coefficients['sgRNAsgRNA', 'Pr(>|t|)']
+    power_results[sim] <- ifelse(p_value < alpha, 1, 0)
+  }
+  power <- mean(power_results, na.rm = TRUE)
+  return(power)
+}
+```
+
+
+```{r}
+power_results <- tibble(
+  num_mice = num_mice_values
+) %>%
+  mutate(
+    power = map_dbl(num_mice, ~ simulate_power(.x))
+  )
+
+# Plotting Power vs Number of Mice
+power_plot <- power_results %>%
+  ggplot(aes(x = num_mice, y = power)) +
+  geom_line() +
+  geom_point() +
+  geom_hline(yintercept = 0.8, linetype = "dashed", color = "red") +
+  labs(
+    x = "Number of Mice",
+    y = "Estimated Power",
+    title = "Power vs Number of Mice"
+  ) +
+  theme_minimal()
+
+print(power_plot)
+```
+
+
+
+

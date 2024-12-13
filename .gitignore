@@ -1,0 +1,7 @@
+.env
+output/
+*.Rproj.user
+*.Rproj
+*.RData
+__pycache__/
+*.pyc
