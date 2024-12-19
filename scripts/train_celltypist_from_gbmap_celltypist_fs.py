@@ -11,6 +11,9 @@ import mplscience
 # 1. Train gbmap data
 adata = sc.read_h5ad('../data/gbmap/extended_gbmap.h5ad')
 
+
+adata.var
+
 # 2. Prepare data : normalize & feature selection
 sc.pp.normalize_total(adata, target_sum = 1e4)
 sc.pp.log1p(adata)
