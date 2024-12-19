@@ -1,7 +1,10 @@
 .env
 output/
+data/
+processed_data/
+intermediate_output/
 *.Rproj.user
 *.Rproj
 *.RData
-__pycache__/
 *.pyc
+__pycache__
