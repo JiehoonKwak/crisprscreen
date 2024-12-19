@@ -7,4 +7,5 @@ intermediate_output/
 *.Rproj
 *.RData
 *.pyc
+*.sqlite
 __pycache__
