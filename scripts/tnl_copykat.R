@@ -18,7 +18,7 @@ sample_id <- obj@meta.data$sample_id
 seurat_list <- SplitObject(obj, split.by = "sample_id")
 
 # Output directory
-output_dir <- "output/copykat_results"
+output_dir <- "/home/jiehoonk/project/crisprscreen/intermediate_output/copykat_results"
 dir.create(output_dir, showWarnings = FALSE)
 
 # Iterate over each subset and run the analysis

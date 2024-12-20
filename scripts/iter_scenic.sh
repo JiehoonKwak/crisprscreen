@@ -1,11 +1,11 @@
 #!/bin/bash
 
-NUM_ITERATIONS=100
+NUM_ITERATIONS=30
 INPUT_FILE="../intermediate_output/annotated_subset.loom"
-ANNOTATIONS_PATH="/home/jiehoonk/mnt/annotations"
+ANNOTATIONS_PATH="/home/jiehoonk/mnt/annotations/new"
 WORKERS=60
 
-for i in $(seq 1 $NUM_ITERATIONS)
+for i in $(seq 11 $NUM_ITERATIONS)
 do
     echo "Starting iteration $i"
 
