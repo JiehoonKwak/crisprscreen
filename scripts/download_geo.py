@@ -1,11 +1,11 @@
 import GEOparse
 import os
-njobs = 12
+njobs = 72
 
 # wang 2022 (Diaz group)
-outdir = "../data/wang2022_NC"
-gse = GEOparse.get_GEO(geo="GSE174554", destdir=outdir, how = 'full')
-gse.download_supplementary_files(directory = outdir, download_sra = False, nproc = njobs)
+# outdir = "../data/wang2022_NC"
+# gse = GEOparse.get_GEO(geo="GSE174554", destdir=outdir, how = 'full')
+# gse.download_supplementary_files(directory = outdir, download_sra = False, nproc = njobs)
 
 # park 2024
 ## 1. snRNA-seq
