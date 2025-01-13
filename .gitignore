@@ -10,5 +10,5 @@ intermediate_output/
 *.pyc
 *.sqlite
 __pycache__
-_copykat*
+copykat*
 *.gz
