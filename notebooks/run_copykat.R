@@ -27,10 +27,12 @@ obj <- readRDS(here("output/cptac.rds"))
 obj <- JoinLayers(obj)
 objs <- SplitObject(obj, split.by = "donor_id")
 
+predictions <- list()
+
 for (i in seq_along(objs)) {
     mat <- GetAssayData(objs[[i]], layer = "counts")
 
-    out <- copykat(rawmat = mat, sam.name = names(objs)[i], n.cores = 64)
+    out <- copykat(rawmat = mat, sam.name = names(objs)[i], n.cores = 48)
     pred <- data.frame(out$prediction)
     predictions[[i]] <- pred
     rm(mat, out)
