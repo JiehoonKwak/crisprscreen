@@ -1,16 +1,16 @@
 #!/bin/bash
 
-NUM_ITERATIONS=30
-INPUT_FILE="../intermediate_output/annotated_subset.loom"
-ANNOTATIONS_PATH="/home/jiehoonk/mnt/annotations/new"
+NUM_ITERATIONS=100
+INPUT_FILE="../tmp/seacell.loom" # change
+ANNOTATIONS_PATH="/home/jiehoonk/mnt/annotations/new" # in TNL B
 WORKERS=60
 
-for i in $(seq 16 $NUM_ITERATIONS)
+for i in $(seq 1 $NUM_ITERATIONS)
 do
     echo "Starting iteration $i"
 
     # Create directory for this iteration
-    ITER_DIR="../intermediate_output/pyscenic/iteration_$i"
+    ITER_DIR="../tmp/pyscenic/iteration_$i"
     mkdir -p "$ITER_DIR"
 
     # Step 1: GRN

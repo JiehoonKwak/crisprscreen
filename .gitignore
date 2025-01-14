@@ -12,3 +12,4 @@ intermediate_output/
 __pycache__
 *.gz
 *_copykat_*
+tmp/
