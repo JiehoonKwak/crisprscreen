@@ -84,15 +84,17 @@ if __name__ == '__main__':
     # Load existing combined results if available
     combined_file = 'tmp/seacell.h5ad'
     seacells = []
-    if os.path.exists(combined_file):
-        print("Loading existing combined results...")
-        existing_data = sc.read_h5ad(combined_file)
-        seacells.append(existing_data)
-        # Get sample names from existing data to skip
-        completed_samples.update(
-            set(name.split('-')[0] + '.h5ad' 
-                for name in existing_data.obs.index)
-        )
+
+    # skipping due to wrong samples
+    # if os.path.exists(combined_file):
+    #     print("Loading existing combined results...")
+    #     existing_data = sc.read_h5ad(combined_file)
+    #     seacells.append(existing_data)
+    #     # Get sample names from existing data to skip
+    #     completed_samples.update(
+    #         set(name.split('-')[0] + '.h5ad' 
+    #             for name in existing_data.obs.index)
+    #     )
     
     # Filter files to process
     files = os.listdir('tmp')
