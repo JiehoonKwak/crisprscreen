@@ -1,9 +1,9 @@
 #!/bin/bash
 
 NUM_ITERATIONS=100
-INPUT_FILE="../tmp/seacell.loom" # change
+INPUT_FILE="../tmp/pyscenic/seacell.loom" # change
 ANNOTATIONS_PATH="/home/jiehoonk/mnt/annotations/new" # in TNL B
-WORKERS=60
+WORKERS=54
 
 for i in $(seq 1 $NUM_ITERATIONS)
 do
