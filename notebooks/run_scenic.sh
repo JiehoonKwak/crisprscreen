@@ -1,11 +1,11 @@
 #!/bin/bash
 
-NUM_ITERATIONS=100
+NUM_ITERATIONS=50
 INPUT_FILE="../tmp/pyscenic/seacell.loom" # change
 ANNOTATIONS_PATH="/home/jiehoonk/mnt/annotations/new" # in TNL B
-WORKERS=54
+WORKERS=42
 
-for i in $(seq 51 $NUM_ITERATIONS)
+for i in $(seq 1 $NUM_ITERATIONS)
 do
     echo "Starting iteration $i"
 
